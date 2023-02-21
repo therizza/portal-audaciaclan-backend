@@ -4,10 +4,15 @@ import (
 	"bytes"
 	"crypto/sha512"
 	"database/sql"
+	"mime"
+	"mime/multipart"
 	"net/http"
+	"path/filepath"
 	db "portal-audaciaclan-backend/db/sqlc"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -191,6 +196,42 @@ func (server *Server) getUserByEmail(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
-func (server *Server) uploadUser(c *gin.Context) {
+type postUserPhoto struct {
+	ID    int                   `form:"id" binding:"required"`
+	Image *multipart.FileHeader `form:"image" binding:"required"`
+}
 
+func (server *Server) uploadUser(c *gin.Context) {
+	var req postUserPhoto
+
+	err := c.ShouldBind(&req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	// Extrai o arquivo da estrutura
+	file := req.Image
+
+	// Verifica se o arquivo é uma imagem
+	ext := filepath.Ext(file.Filename)
+	if ext == "" || !strings.HasPrefix(mime.TypeByExtension(ext), "image/") {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "File must be an image"})
+		return
+	}
+
+	// Verifica o tamanho do arquivo (3 MB = 3 * 1024 * 1024 bytes)
+	if file.Size > 3*1024*1024 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Image size should be up to 3 MB"})
+		return
+	}
+
+	// Gera um nome único para o arquivo
+	uuidFilename := uuid.New().String() + ext
+
+	// Salva o arquivo no servidor
+	if err := c.SaveUploadedFile(file, "upload/"+uuidFilename); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 }

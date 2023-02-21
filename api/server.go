@@ -19,7 +19,7 @@ func NewServer(store *db.SQLStore) *Server {
 	router.POST("/user", server.createUser)
 	router.GET("/user/id/:id", server.getUserById)
 	router.GET("/user/email/:email", server.getUserByEmail)
-	router.POST("/user/upload", server.uploadUser)
+	router.POST("/user/upload/", server.uploadUser)
 
 	//Bring system data
 	router.POST("/system/status/", server.createStatus)
