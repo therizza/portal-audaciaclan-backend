@@ -216,13 +216,13 @@ func (server *Server) uploadUser(c *gin.Context) {
 	// Verifica se o arquivo é uma imagem
 	ext := filepath.Ext(file.Filename)
 	if ext == "" || !strings.HasPrefix(mime.TypeByExtension(ext), "image/") {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "File must be an image"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "O arquivo deve ser uma imagem"})
 		return
 	}
 
 	// Verifica o tamanho do arquivo (3 MB = 3 * 1024 * 1024 bytes)
 	if file.Size > 3*1024*1024 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Image size should be up to 3 MB"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "O tamanho da imagem deve ser de até 3 MB"})
 		return
 	}
 
