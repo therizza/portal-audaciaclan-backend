@@ -210,6 +210,13 @@ func (server *Server) uploadUser(c *gin.Context) {
 		return
 	}
 
+	// Verifica se o token é válido
+	token, err := ValidateAuthorizationHeader(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
 	// Extrai o arquivo da estrutura
 	file := req.Image
 

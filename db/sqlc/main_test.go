@@ -11,7 +11,7 @@ import (
 
 const (
 	dbDriver = "postgres"
-	dbSource = "postgresql://root:root@localhost:5432/audacia?sslmode=disable"
+	dbSource = "postgresql://postgres:root@localhost:5432/root?sslmode=disable"
 )
 
 var testQueries *Queries
